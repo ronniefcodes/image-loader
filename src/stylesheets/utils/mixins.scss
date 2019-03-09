@@ -1,0 +1,26 @@
+// clearfix
+@mixin clearfix {
+  &:after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin max-screen($res) {
+  @media screen and (max-width: $res){
+    @content;
+  }
+}
+
+@mixin min-screen($res) {
+  @media screen and (min-width: $res){
+    @content;
+  }
+}
+
+@mixin print {
+  @media print {
+    @content;
+  }
+}

@@ -1,0 +1,12 @@
+// BREAKPOINT SIZES
+$small: 480px;
+$medium: 768px;
+$large: 1024px;
+$x-large: 1280px;
+
+// DEVICE BREAKPOINTS
+$mobile: 0;
+$tablet: $small;
+$tablet-landscape: $medium;
+$desktop: $large;
+$large-desktop: $x-large;
