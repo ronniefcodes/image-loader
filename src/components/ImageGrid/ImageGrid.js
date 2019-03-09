@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import './ImageGrid.scss';
 import Image from '../Image';
 
-import { isVideoAsset, } from '../../lib/imgur';
-
 class ImageGrid extends Component {
   constructor(props) {
     super(props);
@@ -65,8 +63,8 @@ class ImageGrid extends Component {
 
     return (
       <div className="image-grid">
-        {images && images.map(image =>
-          !isVideoAsset(image) && <Image
+        {images && images.forEach(image =>
+          <Image
             key={`image--${image.id}`}
             {...image}
             onLoadComplete={() => this.handleImageLoaded()}

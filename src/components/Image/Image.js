@@ -2,13 +2,12 @@ import React, { Component } from 'react';
 import './Image.scss';
 import ImageTitle from '../ImageTitle';
 
-import { getImageUrl, } from '../../lib/imgur';
-
 class Image extends Component {
   render() {
     const {
       id,
       isPinned,
+      link,
       title,
       onLoadComplete,
       onLoadError,
@@ -21,7 +20,7 @@ class Image extends Component {
         {title && <ImageTitle title={title} />}
         <img
           alt={title}
-          src={getImageUrl(this.props)}
+          src={link}
           onLoad={() => {
             if (onLoadComplete) onLoadComplete(id);
           }}

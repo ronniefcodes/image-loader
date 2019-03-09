@@ -13,6 +13,18 @@ const getFetchRequest = (endpointUrl, params) => {
   });
 };
 
+// get image asset from objects
+const getPrimaryImageAsset = (object) => {
+  const asset = !object.images ? object : object.images[0];
+
+  return asset;
+};
+
+// determine whether or not object is a video
+const isVideoAsset = (object) => {
+  return object.type.indexOf('video') !== -1;
+};
+
 // get image objects from a given gallery (defaults to top)
 export const fetchGalleryImages = (params) => {
   const settings = Object.assign({}, _API_SETTINGS, params);
@@ -68,21 +80,4 @@ export const getImagesFromResponseObject = (resp) => {
 export const getCanMakeApiRequest = (response) => {
   return response.headers.get('x-rateLimit-userLimit') > 0 &&
     response.headers.get('x-rateLimit-clientremaining') > 0;
-};
-
-// get image asset from objects
-export const getPrimaryImageAsset = (object) => {
-  const asset = !object.images ? object : object.images[0];
-
-  return asset;
-};
-
-// get image url from image objects
-export const getImageUrl = (object) => {
-  return getPrimaryImageAsset(object).link;
-};
-
-// determine whether or not object is a video
-export const isVideoAsset = (object) => {
-  return getPrimaryImageAsset(object).type.indexOf('video') !== -1;
 };
