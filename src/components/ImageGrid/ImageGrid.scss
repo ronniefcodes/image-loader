@@ -1,9 +1,14 @@
+@import '../../stylesheets/base';
+
 .image-grid {
   width: 100%;
   min-height: 100vh;
 
   .image-container {
     display: inline-block;
-    max-width: 33%;
+
+    @include min-screen($tablet-landscape) {
+      max-width: 33%;      
+    }
   }
 }

@@ -31,3 +31,10 @@ export const getImageUrl = (object) => {
 
   return object.images[0].link;
 }
+
+// determine whether or not object is a video
+export const isVideoAsset = (object) => {
+  if (!object.images) return false;
+
+  return object.images[0].type.indexOf('video') !== -1;
+}
