@@ -5,7 +5,6 @@ export const updatePinnedImagesCookie = (id) => {
 
   const idIndex = cookie.indexOf(id);
 
-  console.log(id, idIndex);
   if (idIndex === -1) cookie.push(id);
   else cookie.splice(idIndex, 1);
 
