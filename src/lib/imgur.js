@@ -1,6 +1,6 @@
 const _API_SETTINGS = {
   baseUrl: 'https://api.imgur.com',
-  galleryName: 'top',
+  galleryName: 'user',
 };
 
 // get image objects from a given gallery (defaults to top)
@@ -27,13 +27,13 @@ export const getImagesFromGalleryResponse = (images) => {
 
 // return whether or not an api response was marked successful
 export const isRequestSuccessful = (response) => {
-  return response.success && response.status === 200;
+  return response.status === 200;
 };
 
 // determine whether or not the user is able to make a request with the imgur api
 export const getCanMakeApiRequest = (response) => {
   return response.headers.get('x-rateLimit-userLimit') > 0 &&
-    response.headers.get('x-rateLimit-clientremaining') > 0;  
+    response.headers.get('x-rateLimit-clientremaining') > 0;
 };
 
 // get image url from image objects

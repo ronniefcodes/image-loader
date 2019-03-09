@@ -62,15 +62,23 @@ class App extends Component {
     fetchGalleryImages(params).then(resp => {
       if (isRequestSuccessful(resp)) {
         resp.json().then(({ data, } = {}) => {
-          const updatedImages = appendDistinct(images, getImagesFromGalleryResponse(data), 'id');
+          const newImages = getImagesFromGalleryResponse(data);
 
-          if (updatedImages.length > maxImagesLoaded) updatedImages.splice(maxImagesLoaded);
+          if (newImages.length > 0) {
+            const updatedImages = appendDistinct(images, newImages, 'id');
 
-          this.setState({
-            images: updatedImages,
-            pendingImageUpdate: false,
-            canMakeApiRequests: getCanMakeApiRequest(resp),
-          });
+            if (updatedImages.length > maxImagesLoaded) updatedImages.splice(maxImagesLoaded);
+
+            this.setState({
+              images: updatedImages,
+              pendingImageUpdate: false,
+              canMakeApiRequests: getCanMakeApiRequest(resp),
+            });
+          }
+        });
+      } else {
+        this.setState({
+          canMakeApiRequests: false,
         });
       }
     });

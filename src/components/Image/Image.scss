@@ -1,8 +1,19 @@
+@import '../../stylesheets/base';
+
 .image-container {
   overflow: hidden;
+  position: relative;
 
   img {
     max-width: 100%;
     height: auto;
+  }
+
+  .image__title {
+    position: absolute;
+    bottom: 2%;
+    left: 0;
+    right: 0;
+    background: rgba($gray-dark, 0.5);
   }
 }
