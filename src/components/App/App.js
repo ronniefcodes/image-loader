@@ -103,7 +103,7 @@ class App extends Component {
     } = this.state;
 
     // if additional images are meant to be loaded, increment current page
-    if (images.length < maxImagesLoaded) {
+    if (!maxImagesLoaded || images.length < maxImagesLoaded) {
       this.setState({
         pendingImageUpdate: true,
         currentPage: currentPage + 1,
