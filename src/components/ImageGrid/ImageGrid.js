@@ -52,7 +52,6 @@ class ImageGrid extends Component {
 
       // check to see if the total loaded images matches array
       if (totalLoaded === images.length) {
-        console.log('images loaded');
         if (onLoadComplete) onLoadComplete();
       }
     }
@@ -61,6 +60,7 @@ class ImageGrid extends Component {
   render() {
     const {
       images,
+      onImagePin,
     } = this.props;
 
     return (
@@ -71,6 +71,7 @@ class ImageGrid extends Component {
             {...image}
             onLoadComplete={() => this.handleImageLoaded()}
             onLoadError={() => this.handleImageError()}
+            onPin={id => onImagePin && onImagePin(id)}
           />
         )}
       </div>

@@ -6,13 +6,17 @@ import Loader from '../Loader';
 
 import {
   fetchGalleryImages,
-  getImagesFromGalleryResponse,
+  fetchImagesByIds,
+  getImagesFromResponseObject,
   getCanMakeApiRequest,
-  isRequestSuccessful,
 } from '../../lib/imgur';
 import {
   appendDistinct,
 } from '../../utils/arrays';
+import {
+  getPinnedImagesCookie,
+  updatePinnedImagesCookie,
+} from '../../utils/cookies';
 
 class App extends Component {
   constructor(props) {
@@ -31,7 +35,16 @@ class App extends Component {
       hasInitialized: true,
     });
 
-    this.loadGalleryPage();
+    fetchImagesByIds(getPinnedImagesCookie(), this.props).then(images => {
+      this.setState({
+        images: images.map(image => {
+          image.isPinned = true;
+          return image;
+        }),
+      });
+    }).finally(() => {
+      this.loadGalleryPage();
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -60,27 +73,23 @@ class App extends Component {
     });
 
     fetchGalleryImages(params).then(resp => {
-      if (isRequestSuccessful(resp)) {
-        resp.json().then(({ data, } = {}) => {
-          const newImages = getImagesFromGalleryResponse(data);
+      getImagesFromResponseObject(resp).then(newImages => {
+        if (newImages.length > 0) {
+          const updatedImages = appendDistinct(images, newImages, 'id');
 
-          if (newImages.length > 0) {
-            const updatedImages = appendDistinct(images, newImages, 'id');
+          if (updatedImages.length > maxImagesLoaded) updatedImages.splice(maxImagesLoaded);
 
-            if (updatedImages.length > maxImagesLoaded) updatedImages.splice(maxImagesLoaded);
-
-            this.setState({
-              images: updatedImages,
-              pendingImageUpdate: false,
-              canMakeApiRequests: getCanMakeApiRequest(resp),
-            });
-          }
-        });
-      } else {
+          this.setState({
+            images: updatedImages,
+            pendingImageUpdate: false,
+            canMakeApiRequests: getCanMakeApiRequest(resp),
+          });
+        }
+      }, () => {
         this.setState({
           canMakeApiRequests: false,
         });
-      }
+      });
     });
   }
 
@@ -102,6 +111,31 @@ class App extends Component {
     }
   }
 
+  handleImagePin(id) {
+    const {
+      images,
+    } = this.state;
+
+    updatePinnedImagesCookie(id);
+
+    const updatedImages = images.map(image => {
+      if (image.id === id) {
+        image.isPinned = !image.isPinned;
+      }
+
+      return image;
+    });
+
+    updatedImages.sort((a, b) => {
+      if (a.isPinned) return -1;
+      return 0;
+    });
+
+    this.setState({
+      images: updatedImages,
+    });
+  }
+
   render() {
     const {
       hasInitialized,
@@ -116,6 +150,7 @@ class App extends Component {
             images={images}
             pendingImageUpdate={pendingImageUpdate}
             onLoadComplete={() => this.handleLoadComplete()}
+            onImagePin={id => this.handleImagePin(id)}
           />
           :
           <Loader />}

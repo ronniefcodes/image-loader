@@ -16,4 +16,11 @@
     right: 0;
     background: rgba($gray-dark, 0.5);
   }
+
+  .image__pin-button {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    font-size: 20px;
+  }
 }

@@ -3,31 +3,84 @@ const _API_SETTINGS = {
   galleryName: 'user',
 };
 
-// get image objects from a given gallery (defaults to top)
-export const fetchGalleryImages = (params) => {
-  const settings = Object.assign({}, _API_SETTINGS, params);
-
-  return fetch(`${settings.baseUrl}/3/gallery/${settings.galleryName}/${settings.currentGalleryPage || 0}`, {
-    method: 'GET',
+// make fetch request
+const getFetchRequest = (endpointUrl, params) => {
+  return fetch(`${params.baseUrl}${endpointUrl}`, {
+    method: params.httpMethod || 'GET',
     headers: {
       "Authorization": `Client-ID ${params.apiClientId}`,
     },
   });
 };
 
-// get images from gallery response without videos
-export const getImagesFromGalleryResponse = (images) => {
-  console.log(images);
-  if (!images) return [];
+// get image objects from a given gallery (defaults to top)
+export const fetchGalleryImages = (params) => {
+  const settings = Object.assign({}, _API_SETTINGS, params);
 
-  return images.filter(image => {
-    return !isVideoAsset(image);
-  });
+  return getFetchRequest(`/3/gallery/${settings.galleryName}/${settings.currentGalleryPage || 0}`, settings);
 };
 
-// return whether or not an api response was marked successful
-export const isRequestSuccessful = (response) => {
-  return response.status === 200;
+// get image objects from an array of ids
+export const fetchImagesByIds = (ids, params) => {
+  const settings = Object.assign({}, _API_SETTINGS, params);
+
+  const promises = ids.map(id => {
+    const promise = new Promise((resolve, reject) => {
+      getFetchRequest(`/3/image/${id}`, settings).then(resp => {
+        getImageFromResponseObject(resp).then(newImage => {
+          resolve(newImage);
+        });
+      });
+    });
+
+    return promise;
+  });
+
+  return Promise.all(promises);
+};
+
+// get image from api response
+export const getImageFromResponseObject = (resp) => {
+  const promise = new Promise((resolve, reject) => {
+    if (resp.status !== 200) {
+      reject();
+    }
+
+    // convert response object to json in order to get data array
+    resp.json().then(({ data, } = {}) => {
+      // get primary image asset from data array without video objects
+      const image = getPrimaryImageAsset(data);
+
+      if (isVideoAsset(image)) reject();
+
+      resolve(image);
+    });
+  });
+
+  return promise;
+};
+
+// get images from gallery response without videos
+export const getImagesFromResponseObject = (resp) => {
+  const promise = new Promise((resolve, reject) => {
+    if (resp.status !== 200) {
+      reject();
+    }
+
+    // convert response object to json in order to get data array
+    resp.json().then(({ data, } = {}) => {
+      // get primary image asset from data array without video objects
+      const images = data.map(image => {
+        return getPrimaryImageAsset(image);
+      }).filter(image => {
+        return !isVideoAsset(image);
+      });
+
+      resolve(images);
+    });
+  });
+
+  return promise;
 };
 
 // determine whether or not the user is able to make a request with the imgur api
@@ -36,16 +89,19 @@ export const getCanMakeApiRequest = (response) => {
     response.headers.get('x-rateLimit-clientremaining') > 0;
 };
 
+// get image asset from objects
+export const getPrimaryImageAsset = (object) => {
+  const asset = !object.images ? object : object.images[0];
+
+  return asset;
+};
+
 // get image url from image objects
 export const getImageUrl = (object) => {
-  if (!object.images) return object.link;
-
-  return object.images[0].link;
-}
+  return getPrimaryImageAsset(object).link;
+};
 
 // determine whether or not object is a video
 export const isVideoAsset = (object) => {
-  if (!object.images) return false;
-
-  return object.images[0].type.indexOf('video') !== -1;
-}
+  return getPrimaryImageAsset(object).type.indexOf('video') !== -1;
+};
