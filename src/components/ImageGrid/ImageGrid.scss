@@ -2,13 +2,15 @@
 
 .image-grid {
   width: 100%;
+  max-width: 1280px;
   min-height: 100vh;
+  margin: 0 auto;
 
   .image-container {
     display: inline-block;
 
     @include min-screen($tablet-landscape) {
-      max-width: 33%;      
+      max-width: 33%;
     }
   }
 }

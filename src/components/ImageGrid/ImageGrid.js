@@ -10,7 +10,52 @@ class ImageGrid extends Component {
 
     this.state = {
       imagesLoaded: 0,
+      imagesLoadedWithError: 0,
     };
+  }
+
+  handleImageLoaded(id) {
+    const {
+      imagesLoaded,
+    } = this.state;
+
+    this.setState({
+      imagesLoaded: imagesLoaded + 1,
+    });
+  }
+
+  handleImageError() {
+    const {
+      imagesLoadedWithError,
+    } = this.state;
+
+    this.setState({
+      imagesLoadedWithError: imagesLoadedWithError + 1,
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    const {
+      images,
+      pendingImageUpdate,
+      onLoadComplete,
+    } = this.props;
+
+    const {
+      imagesLoaded,
+      imagesLoadedWithError,
+    } = this.state;
+
+    // if there isn't a pending image array update
+    if (!pendingImageUpdate) {
+      const totalLoaded = imagesLoaded + imagesLoadedWithError;
+
+      // check to see if the total loaded images matches array
+      if (totalLoaded === images.length) {
+        console.log('images loaded');
+        if (onLoadComplete) onLoadComplete();
+      }
+    }
   }
 
   render() {
@@ -20,11 +65,12 @@ class ImageGrid extends Component {
 
     return (
       <div className="image-grid">
-        {images && images.map((image, i) =>
+        {images && images.map(image =>
           !isVideoAsset(image) && <Image
-            key={`image--${i}`}
+            key={`image--${image.id}`}
             {...image}
-            onLoaded={this.handleImageLoaded}
+            onLoadComplete={() => this.handleImageLoaded()}
+            onLoadError={() => this.handleImageError()}
           />
         )}
       </div>

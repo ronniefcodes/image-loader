@@ -3,8 +3,8 @@ const _API_SETTINGS = {
   galleryName: 'top',
 };
 
-// geet image objects from a given gallery (defaults to top)
-export const getGalleryImages = (params) => {
+// get image objects from a given gallery (defaults to top)
+export const fetchGalleryImages = (params) => {
   const settings = Object.assign({}, _API_SETTINGS, params);
 
   return fetch(`${settings.baseUrl}/3/gallery/${settings.galleryName}/${settings.currentGalleryPage || 0}`, {
@@ -12,6 +12,13 @@ export const getGalleryImages = (params) => {
     headers: {
       "Authorization": `Client-ID ${params.apiClientId}`,
     },
+  });
+};
+
+// get images from gallery response without videos
+export const getImagesFromGalleryResponse = (images) => {
+  return images.filter(image => {
+    return !isVideoAsset(image);
   });
 };
 

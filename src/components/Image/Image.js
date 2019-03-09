@@ -7,17 +7,24 @@ import { getImageUrl, } from '../../lib/imgur';
 class Image extends Component {
   render() {
     const {
+      id,
       title,
-      ...others
+      onLoadComplete,
+      onLoadError,
     } = this.props;
 
-    console.log(this.props);
     return (
       <div className="image-container">
         {title && <ImageTitle title={title} />}
         <img
-          alt=""
-          src={getImageUrl(others)}
+          alt={title}
+          src={getImageUrl(this.props)}
+          onLoad={() => {
+            if (onLoadComplete) onLoadComplete(id);
+          }}
+          onError={() => {
+            if (onLoadError) onLoadError(id);
+          }}
         />
       </div>
     );

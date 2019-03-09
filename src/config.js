@@ -1,6 +1,6 @@
 const config = {
   apiClientId: '4fce162df53505a',
-  loadIntervalSize: 12,
+  maxImagesLoaded: 200,
 };
 
 export default config;
