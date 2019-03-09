@@ -27,8 +27,8 @@ export const fetchImagesByIds = (ids, params) => {
   const promises = ids.map(id => {
     const promise = new Promise((resolve, reject) => {
       getFetchRequest(`/3/image/${id}`, settings).then(resp => {
-        getImageFromResponseObject(resp).then(newImage => {
-          resolve(newImage);
+        getImagesFromResponseObject(resp).then(newImages => {
+          resolve(newImages[0]);
         });
       });
     });
@@ -37,27 +37,6 @@ export const fetchImagesByIds = (ids, params) => {
   });
 
   return Promise.all(promises);
-};
-
-// get image from api response
-export const getImageFromResponseObject = (resp) => {
-  const promise = new Promise((resolve, reject) => {
-    if (resp.status !== 200) {
-      reject();
-    }
-
-    // convert response object to json in order to get data array
-    resp.json().then(({ data, } = {}) => {
-      // get primary image asset from data array without video objects
-      const image = getPrimaryImageAsset(data);
-
-      if (isVideoAsset(image)) reject();
-
-      resolve(image);
-    });
-  });
-
-  return promise;
 };
 
 // get images from gallery response without videos
@@ -69,8 +48,10 @@ export const getImagesFromResponseObject = (resp) => {
 
     // convert response object to json in order to get data array
     resp.json().then(({ data, } = {}) => {
+      let images = Array.isArray(data) ? data : [ data ];
+
       // get primary image asset from data array without video objects
-      const images = data.map(image => {
+      images = images.map(image => {
         return getPrimaryImageAsset(image);
       }).filter(image => {
         return !isVideoAsset(image);
