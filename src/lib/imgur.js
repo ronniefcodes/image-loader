@@ -17,6 +17,9 @@ export const fetchGalleryImages = (params) => {
 
 // get images from gallery response without videos
 export const getImagesFromGalleryResponse = (images) => {
+  console.log(images);
+  if (!images) return [];
+
   return images.filter(image => {
     return !isVideoAsset(image);
   });
@@ -27,9 +30,10 @@ export const isRequestSuccessful = (response) => {
   return response.success && response.status === 200;
 };
 
-// get header value for remaining available requests
-export const getRemainingRequests = (response) => {
-  return response.headers.get('x-ratelimit-clientremaining');
+// determine whether or not the user is able to make a request with the imgur api
+export const getCanMakeApiRequest = (response) => {
+  return response.headers.get('x-rateLimit-userLimit') > 0 &&
+    response.headers.get('x-rateLimit-clientremaining') > 0;  
 };
 
 // get image url from image objects

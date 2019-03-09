@@ -7,7 +7,7 @@ import Loader from '../Loader';
 import {
   fetchGalleryImages,
   getImagesFromGalleryResponse,
-  getRemainingRequests,
+  getCanMakeApiRequest,
   isRequestSuccessful,
 } from '../../lib/imgur';
 import {
@@ -27,22 +27,29 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this.setState({
+      hasInitialized: true,
+    });
+
     this.loadGalleryPage();
   }
 
   componentDidUpdate(prevProps, prevState) {
     const {
       pendingImageUpdate,
-      remainingRequests,
+      canMakeApiRequests,
     } = this.state;
 
     // if the page has changed, load a new gallery page
-    if (pendingImageUpdate !== prevState.pendingImageUpdate && remainingRequests.length > 0) {
+    if (pendingImageUpdate !== prevState.pendingImageUpdate && canMakeApiRequests.length > 0) {
       this.loadGalleryPage();
     }
   }
 
   loadGalleryPage() {
+    const {
+      maxImagesLoaded,
+    } = this.props;
     const {
       images,
       currentPage,
@@ -55,11 +62,14 @@ class App extends Component {
     fetchGalleryImages(params).then(resp => {
       if (isRequestSuccessful) {
         resp.json().then(({ data, } = {}) => {
+          const updatedImages = appendDistinct(images, getImagesFromGalleryResponse(data), 'id');
+
+          if (updatedImages.length > maxImagesLoaded) updatedImages.splice(maxImagesLoaded);
+
           this.setState({
-            images: appendDistinct(images, getImagesFromGalleryResponse(data), 'id'),
+            images: updatedImages,
             pendingImageUpdate: false,
-            remainingRequests: getRemainingRequests(resp),
-            hasInitialized: true,
+            canMakeApiRequests: getCanMakeApiRequest(resp),
           });
         });
       }

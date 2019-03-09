@@ -10,7 +10,9 @@
     display: inline-block;
 
     @include min-screen($tablet-landscape) {
-      max-width: 33%;
+      max-width: 25%;
+      height: 0;
+      padding-bottom: 25%;
     }
   }
 }
