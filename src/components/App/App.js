@@ -41,7 +41,7 @@ class App extends Component {
     } = this.state;
 
     // if the page has changed, load a new gallery page
-    if (pendingImageUpdate !== prevState.pendingImageUpdate && canMakeApiRequests.length > 0) {
+    if (canMakeApiRequests && pendingImageUpdate !== prevState.pendingImageUpdate) {
       this.loadGalleryPage();
     }
   }
