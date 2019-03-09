@@ -60,7 +60,7 @@ class App extends Component {
     });
 
     fetchGalleryImages(params).then(resp => {
-      if (isRequestSuccessful) {
+      if (isRequestSuccessful(resp)) {
         resp.json().then(({ data, } = {}) => {
           const updatedImages = appendDistinct(images, getImagesFromGalleryResponse(data), 'id');
 
