@@ -63,7 +63,7 @@ class ImageGrid extends Component {
 
     return (
       <div className="image-grid">
-        {images && images.forEach(image =>
+        {images && images.map(image =>
           <Image
             key={`image--${image.id}`}
             {...image}
